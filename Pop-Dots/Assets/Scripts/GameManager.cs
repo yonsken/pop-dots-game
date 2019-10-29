@@ -51,7 +51,8 @@ public class GameManager : MonoBehaviour
         Vector2 nextPosToRaycastFrom = playerIntialPos;
         for (int dotIndex = 0; dotIndex < noOfDots; dotIndex++)
         {
-            RaycastHit2D hitInfo = Physics2D.Raycast(nextPosToRaycastFrom, nextRaycastDir);
+            LayerMask mask = LayerMask.GetMask("CollisionTrajectorySimulation");
+            RaycastHit2D hitInfo = Physics2D.Raycast(nextPosToRaycastFrom, nextRaycastDir, Mathf.Infinity, mask);
 
             // Debugging outputs
             Debug.Log("Reflection no. " + (dotIndex + 1) + " happened at position: " + hitInfo.point);
