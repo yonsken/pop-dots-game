@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 984041051441141673}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: PlayerTag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,8 +118,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigid2D: {fileID: 3039927711523342566}
   moveSpeed: 20
-  leftButtonIsPressed: 0
+  leftClickedOnPlayer: 0
   controlEnabled: 0
+  holdingDragEnabled: 0
+  holdingLeftMButton: 0
+  releasedLeftMButton: 0
+  releasedLeftClickOnPlayer: 0
 --- !u!58 &984041051441141673
 CircleCollider2D:
   m_ObjectHideFlags: 0

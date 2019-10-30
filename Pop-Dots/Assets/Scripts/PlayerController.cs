@@ -8,13 +8,17 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rigid2D;
 
     public float moveSpeed = 5f;
-    public bool leftButtonIsPressed;
+    public bool leftClickedOnPlayer;
     public bool controlEnabled;
+    public bool holdingDragEnabled;
+    public bool holdingLeftMButton;
+    public bool releasedLeftMButton;
+    public bool releasedLeftClickOnPlayer;
 
     int numberOfReflections;
 
     Vector3 initialPos;
-    Vector3 leftClickPos;
+    Vector3 possibleReleasePos;
     Vector3 direction;
 
     Camera mainCam;
@@ -33,8 +37,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        leftButtonIsPressed = Input.GetMouseButtonDown(0);
-        HandleMovement();
+        holdingLeftMButton = Input.GetMouseButton(0);
+        releasedLeftMButton = Input.GetMouseButtonUp(0);
+
+        if (!holdingDragEnabled && leftClickedOnPlayer)
+        {
+            leftClickedOnPlayer = false;
+            holdingDragEnabled = true;
+        }
+
+        if (controlEnabled)
+        {
+            UpdateMovementState();
+        }
     }
 
     void FixedUpdate()
@@ -42,18 +57,31 @@ public class PlayerController : MonoBehaviour
         MovePlayerInDirection();
     }
 
-    void HandleMovement()
+    void UpdateMovementState()
     {
-        if (leftButtonIsPressed && controlEnabled)
+        if (holdingDragEnabled && holdingLeftMButton)
         {
-            controlEnabled = false;
-
-            leftClickPos = mainCam.ScreenToWorldPoint(Input.mousePosition);
-            leftClickPos = new Vector3(leftClickPos.x, leftClickPos.y, 0f);
-            Debug.Log(leftClickPos);
-
-            CalculateDirection();
+            possibleReleasePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+            possibleReleasePos = new Vector2(possibleReleasePos.x, possibleReleasePos.y);
         }
+
+        if (holdingDragEnabled && releasedLeftMButton)
+        {
+            if (!releasedLeftClickOnPlayer)
+            {
+                CalculateDirection();
+                holdingDragEnabled = false;
+
+                controlEnabled = false;
+                releasedLeftClickOnPlayer = false;
+            }
+            else
+            {
+                holdingDragEnabled = false;
+                releasedLeftClickOnPlayer = false;
+            }
+        }
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -85,11 +113,56 @@ public class PlayerController : MonoBehaviour
 
     void CalculateDirection()
     {
-        direction = (leftClickPos - initialPos).normalized;
+        direction = -(possibleReleasePos - initialPos).normalized;
+        //Debug.Log(direction.magnitude);
     }
 
     void MovePlayerInDirection()
     {
         rigid2D.velocity = direction * moveSpeed;
+        //Debug.Log(rigid2D.velocity.magnitude);
+    }
+
+    /*
+    bool LeftClickedOnPlayer()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit rayHitInfo;
+            Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+            Debug.Log("pas");
+
+            if (Physics.Raycast(ray, out rayHitInfo))
+            {
+                Debug.Log(rayHitInfo.transform.name);
+                if (rayHitInfo.transform.name == "Player(Clone)")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    */
+
+    private void OnMouseDown()
+    {
+        leftClickedOnPlayer = true;
+    }
+
+    private void OnMouseUpAsButton()
+    {
+        releasedLeftClickOnPlayer = true;
     }
 }
